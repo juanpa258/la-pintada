@@ -1,0 +1,348 @@
+/* ================= Variables y Estilos Globales ================= */
+:root {
+    --primary-color: #D44D02; /* Un tono naranja/terracota, cálido como el clima */
+    --secondary-color: #005A3A; /* Un verde oscuro, como las montañas de Antioquia */
+    --dark-color: #2C2C2C; /* Negro suave para texto */
+    --light-color: #F4F4F4; /* Un blanco hueso para fondos */
+    --font-title: 'Montserrat', sans-serif;
+    --font-body: 'Roboto', sans-serif;
+}
+
+html {
+    scroll-behavior: smooth; /* Habilita la navegación suave entre secciones */
+    box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+body {
+    margin: 0;
+    padding-top: 80px; /* Espacio para el header fijo */
+    font-family: var(--font-body);
+    color: var(--dark-color);
+    background-color: #FFFFFF;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ================= Header y Navegación ================= */
+.main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.header-titles h1 {
+    font-family: var(--font-title);
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.header-titles h2 {
+    font-size: 0.9rem;
+    margin: 0;
+    font-weight: 400;
+}
+
+.main-nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: var(--secondary-color);
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.main-nav a:hover {
+    color: var(--primary-color);
+}
+
+/* ================= Hero Section ================= */
+.hero-section {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: var(--light-color);
+    position: relative; /* Para posicionar el carrusel */
+}
+
+.hero-text h1 {
+    font-family: var(--font-title);
+    font-size: 2.8rem;
+    color: var(--dark-color);
+    margin-bottom: 20px;
+}
+
+.hero-text p {
+    font-size: 1.2rem;
+    max-width: 800px;
+    margin: 0 auto 30px;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 15px 30px;
+    background-color: var(--primary-color);
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 50px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #E55D0F;
+    transform: translateY(-3px);
+}
+
+/* ================= Carrusel de Imágenes ================= */
+.carousel-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 40px auto 0;
+    overflow: hidden;
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.carousel-slide {
+    display: flex;
+    width: 100%; /* Ajustado para que cada imagen ocupe el 100% del contenedor */
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide img {
+    width: 100%;
+    flex-shrink: 0; /* Evita que las imágenes se encojan */
+    height: 500px; /* Altura fija para las imágenes del carrusel */
+    object-fit: cover; /* Asegura que la imagen cubra el área sin distorsionarse */
+}
+
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 15px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    z-index: 10;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.carousel-button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.carousel-button.prev {
+    left: 10px;
+}
+
+.carousel-button.next {
+    right: 10px;
+}
+
+/* ================= Secciones de Contenido ================= */
+.content-section {
+    padding: 80px 0;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05); /* Sutil sombra para las secciones */
+    margin-bottom: 20px; /* Espacio entre secciones */
+}
+
+.content-section.alt-bg {
+    background-color: var(--light-color);
+}
+
+.content-section h2 {
+    font-family: var(--font-title);
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: var(--secondary-color);
+}
+
+.content-section h3 {
+    font-family: var(--font-title);
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin-top: 40px;
+    margin-bottom: 15px;
+}
+
+.content-section p {
+    max-width: 800px;
+    margin: 0 auto 20px;
+    text-align: justify; /* Justificar texto para mejor lectura */
+}
+
+.content-section ul {
+    max-width: 800px;
+    margin: 0 auto 20px;
+    text-align: left;
+    list-style-type: disc; /* Asegurar viñetas */
+    padding-left: 20px;
+}
+
+.content-section ul li {
+    margin-bottom: 10px;
+}
+
+.full-width-image {
+    width: 100%;
+    max-width: 900px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+/* ================= Grids para Datos y Tarjetas ================= */
+.facts-grid, .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    text-align: left;
+    margin-top: 40px;
+}
+
+.fact-item {
+    background: #fff;
+    padding: 20px;
+    border-left: 5px solid var(--primary-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.card {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 25px;
+}
+
+.card-content h3 {
+    font-family: var(--font-title);
+    color: var(--primary-color);
+    margin-top: 0;
+}
+
+/* ================= Footer ================= */
+.main-footer {
+    background-color: var(--dark-color);
+    color: #fff;
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.main-footer p {
+    margin: 5px 0;
+}
+
+.main-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* ================= Back to Top Button ================= */
+#backToTopBtn {
+    display: none; /* Hidden by default */
+    position: fixed; /* Fixed/sticky position */
+    bottom: 30px; /* Place the button at the bottom of the page */
+    right: 30px; /* Place the button at the right side */
+    z-index: 99; /* Make sure it does not overlap */
+    border: none; /* Remove borders */
+    outline: none; /* Remove outline */
+    background-color: var(--primary-color); /* Set a background color */
+    color: white; /* Text color */
+    cursor: pointer; /* Add a mouse pointer on hover */
+    padding: 15px; /* Some padding */
+    border-radius: 10px; /* Rounded corners */
+    font-size: 18px; /* Increase font size */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+#backToTopBtn:hover {
+    background-color: #E55D0F; /* Darker background on hover */
+    transform: translateY(-3px);
+}
+
+/* ================= Media Queries para Responsividad ================= */
+@media (max-width: 768px) {
+    body {
+        padding-top: 120px; /* Más espacio para el header que puede hacer wrap */
+    }
+
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .main-nav {
+        margin-top: 10px;
+    }
+
+    .main-nav a {
+        margin: 0 8px;
+    }
+
+    .hero-text h1 {
+        font-size: 2rem;
+    }
+
+    .content-section h2 {
+        font-size: 2rem;
+    }
+
+    .carousel-slide img {
+        height: 300px; /* Ajustar altura del carrusel en móviles */
+    }
+
+    #backToTopBtn {
+        padding: 10px;
+        font-size: 16px;
+        bottom: 20px;
+        right: 20px;
+    }
+}
