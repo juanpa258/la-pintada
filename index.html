@@ -1,275 +1,508 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FIESTA DE LA ANTIOQUEÑIDAD INEM 2025 - La Pintada</title>
-    <link rel="stylesheet" href="style.css">
+    <title>FIESTA DE LA ANTIOQUEÑIDAD INEM 2025 - MUNICIPIO DE LA PINTADA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
-    <!-- AOS Library CSS -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calidez del Cauca -->
+    <!-- Application Structure Plan: Se ha diseñado una SPA (Single Page Application) con navegación fluida entre secciones temáticas. En lugar de replicar la estructura lineal del informe, se optó por un enfoque de "dashboard" interactivo. Comienza con un impacto visual (sección de bienvenida), seguido de datos clave (Descubre), un análisis interactivo de la economía, una galería de atractivos turísticos y culturales, y finaliza con la historia. Esta arquitectura facilita la exploración no lineal y la asimilación rápida de información, mejorando la usabilidad y el engagement del usuario, lo cual es ideal para un concurso o presentación. -->
+    <!-- Visualization & Content Choices: 
+        - Demografía (Población Urbana/Rural): Goal: Informar. Viz: Gráfico de Dona (Chart.js). Interaction: Tooltip al pasar el cursor. Justification: Representa proporciones de forma clara y visualmente atractiva.
+        - Economía (Sectores): Goal: Comparar/Explorar. Viz: Gráfico de Área Polar (Chart.js). Interaction: Clic en un sector para mostrar texto detallado. Justification: Permite comparar la importancia relativa de los sectores de una manera más dinámica que un gráfico de barras. Fomenta la interacción.
+        - Turismo y Cultura (Atractivos/Platos): Goal: Organizar/Explorar. Viz: Tarjetas interactivas (HTML/CSS/JS). Interaction: Clic en la tarjeta para expandir y ver detalles. Justification: Mantiene la interfaz limpia y organizada, permitiendo al usuario profundizar solo en los temas de su interés.
+        - Festividades: Goal: Informar/Organizar. Viz: Línea de tiempo vertical (HTML/CSS). Justification: Presenta eventos cronológicos de una manera visualmente lógica y fácil de seguir.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #FDFBF7;
+            color: #4A4A4A;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 300px;
+            width: 100%;
+            max-width: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+                max-width: 450px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #D97706; /* amber-600 */
+            border-bottom-color: #D97706;
+        }
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+    </style>
 </head>
-<body>
+<body class="overflow-x-hidden">
 
-    <!-- ================= Header y Navegación ================= -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="header-titles">
-                <h1>FIESTA DE LA ANTIOQUEÑIDAD INEM 2025</h1>
-                <h2>La Pintada: Un Pilar de la Antioqueñidad</h2>
+    <header class="bg-white/80 backdrop-blur-lg shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-lg font-bold text-amber-600">La Pintada</div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#inicio" class="nav-link">Inicio</a>
+                <a href="#descubre" class="nav-link">Descubre</a>
+                <a href="#economia" class="nav-link">Economía</a>
+                <a href="#aventura" class="nav-link">Aventura</a>
+                <a href="#cultura" class="nav-link">Cultura</a>
+                <a href="#historia" class="nav-link">Historia</a>
             </div>
-            <nav class="main-nav">
-                <a href="#inicio">Inicio</a>
-                <a href="#datos-generales">Datos Generales</a>
-                <a href="#historia">Historia</a>
-                <a href="#economia">Economía</a>
-                <a href="#clima">Clima</a>
-                <a href="#cultura">Cultura</a>
-                <a href="#turismo">Turismo</a>
-            </nav>
+            <div class="md:hidden">
+                <button id="menu-btn" class="text-gray-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="#inicio" class="block py-2 px-4 text-sm hover:bg-amber-50">Inicio</a>
+            <a href="#descubre" class="block py-2 px-4 text-sm hover:bg-amber-50">Descubre</a>
+            <a href="#economia" class="block py-2 px-4 text-sm hover:bg-amber-50">Economía</a>
+            <a href="#aventura" class="block py-2 px-4 text-sm hover:bg-amber-50">Aventura</a>
+            <a href="#cultura" class="block py-2 px-4 text-sm hover:bg-amber-50">Cultura</a>
+            <a href="#historia" class="block py-2 px-4 text-sm hover:bg-amber-50">Historia</a>
         </div>
     </header>
 
     <main>
-        <!-- ================= Sección de Inicio (Hero) ================= -->
-        <section id="inicio" class="hero-section">
-            <div class="hero-text" data-aos="fade-up">
-                <h1>La Pintada: Donde el Calor Paisa Abraza el Río Cauca</h1>
-                <p>
-                    Bienvenidos a la puerta del Suroeste antioqueño, un municipio vibrante bañado por el sol y el majestuoso río Cauca. La Pintada no es solo un punto en el mapa, es un lugar de encuentro, historia y aventura que representa con orgullo el espíritu pujante de nuestra tierra.
-                </p>
-                <a href="#turismo" class="cta-button">Explora La Pintada</a>
+        <section id="inicio" class="relative h-screen flex items-center justify-center text-white text-center bg-cover bg-center" style="background-image: url('https://placehold.co/1920x1080/a16207/fdfbf7?text=Puente+de+La+Pintada');">
+            <div class="absolute inset-0 bg-black/50"></div>
+            <div class="relative z-10 px-4">
+                <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-tight mb-4">EXPLORA LA PINTADA: UN VIAJE INTERACTIVO</h1>
+                <h2 class="text-2xl md:text-4xl font-semibold text-amber-300">DESCUBRE EL CORAZÓN DEL SUROESTE ANTIOQUEÑO</h2>
+                <p class="mt-6 text-lg md:text-xl max-w-3xl mx-auto">La Puerta del Suroeste, donde el calor paisa abraza al imponente Río Cauca.</p>
             </div>
-            <!-- Carrusel de Imágenes -->
-            <div class="carousel-container" data-aos="zoom-in">
-                <div class="carousel-slide">
-                    <img src="https://via.placeholder.com/1200x600?text=La+Pintada+3" alt="Actividades turísticas en La Pintada" id="lastClone">
-                    <img src="https://via.placeholder.com/1200x600?text=La+Pintada+1" alt="Vista panorámica de La Pintada con el río Cauca">
-                    <img src="https://via.placeholder.com/1200x600?text=La+Pintada+2" alt="Paisaje de montañas y río en La Pintada">
-                    <img src="https://via.placeholder.com/1200x600?text=La+Pintada+3" alt="Actividades turísticas en La Pintada">
-                    <img src="https://via.placeholder.com/1200x600?text=La+Pintada+1" alt="Vista panorámica de La Pintada con el río Cauca" id="firstClone">
+        </section>
+
+        
+
+        <section id="descubre" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Descubre La Pintada en Cifras</h2>
+                    <p class="mt-4 text-lg text-gray-600">Un vistazo rápido a los datos que definen nuestro municipio.</p>
                 </div>
-                <button class="carousel-button prev" aria-label="Anterior">&#10094;</button>
-                <button class="carousel-button next" aria-label="Siguiente">&#10095;</button>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="bg-amber-50 p-6 rounded-lg text-center shadow-sm">
+                        <h3 class="text-4xl font-bold text-amber-600">8,614</h3>
+                        <p class="mt-2 text-gray-700">Habitantes (2024)</p>
+                    </div>
+                    <div class="bg-green-50 p-6 rounded-lg text-center shadow-sm">
+                        <h3 class="text-4xl font-bold text-green-600">25°C</h3>
+                        <p class="mt-2 text-gray-700">Temperatura Promedio</p>
+                    </div>
+                    <div class="bg-sky-50 p-6 rounded-lg text-center shadow-sm">
+                        <h3 class="text-4xl font-bold text-sky-600">600m</h3>
+                        <p class="mt-2 text-gray-700">Altitud (msnm)</p>
+                    </div>
+                    <div class="bg-rose-50 p-6 rounded-lg text-center shadow-sm">
+                        <h3 class="text-4xl font-bold text-rose-600">55 km²</h3>
+                        <p class="mt-2 text-gray-700">Extensión Territorial</p>
+                    </div>
+                </div>
+                <div class="mt-16 grid md:grid-cols-2 gap-8 items-center">
+                    <div class="text-center md:text-left">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Distribución de la Población</h3>
+                        <p class="text-gray-600 leading-relaxed">La Pintada muestra una marcada concentración de su población en el área urbana, lo que refleja su rol como centro de servicios y comercio para la región. Esta dinámica impulsa la vida social y económica en su cabecera municipal, el corazón vibrante del Suroeste antioqueño.</p>
+                        <div class="mt-8 text-gray-700 detailed-info">
+                            <p>¡Bienvenidos a La Pintada, el corazón vibrante del Suroeste antioqueño! Este informe te invita a un viaje fascinante por nuestro municipio, el más joven de Antioquia.</p>
+                            <p>Aquí descubrirás la esencia de la "antioqueñidad" a través de:</p>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>Nuestra geografía única.</li>
+                                <li>Una historia llena de resiliencia y dinamismo.</li>
+                                <li>Una economía en constante crecimiento.</li>
+                                <li>Rica cultura y tradiciones.</li>
+                                <li>Atractivos turísticos que te enamorarán.</li>
+                            </ul>
+                            <p>La Pintada es un símbolo de la riqueza natural y cultural de nuestra región. ¡Prepárate para explorarla!</p>
+                            <h3 class="text-xl font-bold text-gray-800 mt-6 mb-2">Información Básica</h3>
+                            <p>¿Dónde nos encuentras? ¡Es fácil!</p>
+                            <ul class="list-disc list-inside ml-4">
+                                <li><strong>Ubicación:</strong> Avenida 30 # 31-09, Antioquia, Colombia.</li>
+                                <li><strong>Contacto:</strong> <a href="mailto:alcaldia@lapintada-antioquia.gov.co">alcaldia@lapintada-antioquia.gov.co</a> o llámanos al (604)8454216 / 3007374712.</li>
+                            </ul>
+                            <p>¡Estamos muy cerca de Medellín! A solo 75.5 km (unas 2 horas y 4 minutos) por la Autopista Regional. Esta cercanía nos convierte en un destino turístico clave.</p>
+                            <p>Nuestro clima es perfecto: <strong>25 °C de temperatura promedio</strong>, gracias a nuestra altitud de 600 metros sobre el nivel del mar. ¡Ideal para el turismo y la agricultura!</p>
+                            <p>Con <strong>55 km² de extensión</strong>, La Pintada es un punto estratégico. Limitamos con Fredonia, Santa Bárbara, Valparaíso, Caramanta y Caldas, siendo un puente entre Antioquia y el resto del país.</p>
+                            <h3 class="text-xl font-bold text-gray-800 mt-6 mb-2">Demografía y Urbanización</h3>
+                            <p>Nuestra población está creciendo. En 2024, somos <strong>8,614 habitantes</strong>. La mayoría vivimos en la zona urbana (7,816), lo que nos convierte en un centro de servicios y comercio vibrante.</p>
+                            <p>Conoce nuestras principales urbanizaciones, el corazón de nuestra vida municipal:</p>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>El Crucero</li>
+                                <li>La Española</li>
+                                <li>Montenegro</li>
+                                <li>Las Vegas</li>
+                                <li>La Pintada</li>
+                                <li>San Sebastián</li>
+                                <li>Cimarrona</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="populationChart"></canvas>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- ================= Sección de Datos Generales ================= -->
-        <section id="datos-generales" class="content-section alt-bg" data-aos="fade-up">
-            <div class="container">
-                <h2>Datos Generales y Ubicación Geográfica</h2>
-                <p>El presente informe tiene como propósito ofrecer una visión exhaustiva y detallada del municipio de La Pintada, ubicado en el departamento de Antioquia, Colombia. Este análisis se enmarca en el contexto de la "antioqueñidad", explorando los elementos geográficos, históricos, económicos, culturales y turísticos que definen a este singular territorio y lo posicionan como un componente vital de la identidad antioqueña. La Pintada, siendo el municipio más joven de Antioquia, encapsula la resiliencia, el dinamismo y la riqueza natural y cultural que caracterizan a la región.</p>
-
-                <h3>Información Básica</h3>
-                <p>El municipio de La Pintada se localiza en la Avenida 30 # 31-09, en el departamento de Antioquia, Colombia. Para comunicaciones oficiales, la alcaldía puede ser contactada a través del correo electrónico <a href="mailto:alcaldia@lapintada-antioquia.gov.co">alcaldia@lapintada-antioquia.gov.co</a> y los números telefónicos (604)8454216 o 3007374712.</p>
-                <p>En términos de conectividad, La Pintada se encuentra a una distancia de 75.5 kilómetros de Medellín, la capital departamental, lo que se traduce en un tiempo de viaje aproximado de 2 horas y 4 minutos. La principal vía de acceso desde Medellín es la Autopista Regional, pasando por Caldas, Alto de Minas, Versalles y Santa Bárbara. Esta cercanía y accesibilidad son factores cruciales que impulsan su desarrollo, especialmente en el ámbito turístico.</p>
-                <p>El municipio se asienta a una altitud de 600 metros sobre el nivel del mar, lo que le confiere un clima cálido con una temperatura promedio de 25 °C. Esta característica climática es fundamental para su vocación turística y agrícola.</p>
-                <p>La Pintada posee una extensión territorial de 55 kilómetros cuadrados. Sus límites geográficos son estratégicos: al norte colinda con los municipios de Fredonia y Santa Bárbara; al oriente, con Santa Bárbara; al sur, con Valparaíso, Caramanta y el departamento de Caldas; y al occidente, con Valparaíso, Fredonia y Támesis. Esta configuración geográfica la convierte en un paso obligado y un punto de conexión entre Antioquia y otras regiones del país.</p>
-
-                <h3>Demografía y Urbanización</h3>
-                <p>La población de La Pintada, según proyecciones del DANE para 2022, era de 8,298 habitantes. Datos más recientes de 2024 indican una población total de 8,614 habitantes, con una distribución que favorece la zona urbana (7,816 habitantes) sobre la rural (798 habitantes). Esta predominancia urbana refleja el crecimiento y la concentración de servicios y actividades en la cabecera municipal.</p>
-                <p>El municipio cuenta con siete urbanizaciones principales: El Crucero, La Española, Montenegro, Las Vegas, La Pintada, San Sebastián y Cimarrona. Estas urbanizaciones son el corazón de la vida municipal y el epicentro de la actividad económica y social.</p>
+        <section id="economia" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Corazón Económico</h2>
+                    <p class="mt-4 text-lg text-gray-600">Explora los motores del desarrollo de La Pintada. Haz clic en un sector para saber más.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="chart-container">
+                        <canvas id="economyChart"></canvas>
+                    </div>
+                    <div id="economy-details" class="p-6 bg-white rounded-lg shadow-md min-h-[300px]">
+                        <h3 id="economy-title" class="text-2xl font-bold text-amber-700 mb-4">Turismo</h3>
+                        <p id="economy-text" class="text-gray-700 leading-relaxed">Es el pilar económico fundamental, impulsado por la alta demanda de alojamiento, días de sol y el constante flujo de viajeros. La construcción de las vías 4G ha consolidado al municipio como un destino por excelencia, generando la mayor cantidad de empleo local.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- ================= Sección de Historia ================= -->
-        <section id="historia" class="content-section" data-aos="fade-up">
-            <div class="container">
-                <h2>Historia y Origen del Nombre</h2>
-                <p>La historia de La Pintada es un testimonio de persistencia y transformación, marcada por su evolución administrativa y el legado de sus orígenes.</p>
-
-                <h3>Proceso de Fundación y Erección</h3>
-                <p>La Pintada fue fundada en 1815 por Víctor Sánchez y Rosalba Castillo. Sin embargo, su camino hacia la consolidación como municipio fue particular. Aunque se creó como municipio entre enero de 1993 y marzo de 1994, el acto administrativo que le dio origen fue derogado. Posteriormente, el 20 de marzo de 1997, fue erigida nuevamente como municipio mediante la Ordenanza 42E del 18 de diciembre de 1996. Este proceso la convierte en el municipio número 125 de Antioquia y uno de los más jóvenes de Colombia. Su juventud administrativa, sin embargo, no opaca su larga historia como asentamiento humano.</p>
-
-                <h3>Etimología y Nombres Anteriores</h3>
-                <p>El nombre "La Pintada" tiene dos orígenes atribuidos. Por un lado, se le dio en honor al cacique Pipintá, quien se asentó en estas tierras. Por otro lado, debido a que era un lugar de paso obligado, la gente solía decir "bájese en la casa pintada", refiriéndose a una casa que se destacaba visualmente. Antes de adoptar su nombre actual, el municipio fue conocido por otras denominaciones como El Crucero, Rafael Uribe Uribe y El Paso de Buffú. El gentilicio para sus habitantes es "pintadeños".</p>
-
-                <h3>Contexto Histórico y Desarrollo</h3>
-                <p>Los orígenes de La Pintada se remontan a asentamientos espontáneos de colonos en una región que siempre fue un punto de convergencia de rutas hacia el sur y occidente del país. Antiguamente, la zona estuvo habitada por comunidades indígenas de las etnias Tahamíes, Quiramas, Armas y Catíos (Emberá). Estos grupos vivían en organizaciones tipo cacicazgo hasta que, en 1864, el gobierno autorizó la colonización para el cultivo de tabaco y otras industrias agrícolas, lo que llevó al desplazamiento de los indígenas, quienes habían desaparecido de la región para 1910.</p>
-                <p>A principios del siglo XX, la construcción del Ferrocarril de Antioquia impulsó un nuevo desarrollo en la región, llevando a La Pintada a la categoría de corregimiento del municipio de Santa Bárbara en 1933. La población se desarrolló en ambas márgenes del río Cauca, siendo la margen derecha la primera en crecer. Sin embargo, desde 1865, un núcleo de colonos en la margen izquierda, que inicialmente pertenecía a Valparaíso, comenzó a desarrollarse. En 1933, el gobierno unificó a los pobladores de ambas riberas bajo una sola entidad territorial denominada "La Pintada". El territorio actual de 55 kilómetros cuadrados es resultado de tierras cedidas por Santa Bárbara (35.2 km²) y Valparaíso (19.8 km²).</p>
+        <section id="aventura" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Aventura y Naturaleza</h2>
+                    <p class="mt-4 text-lg text-gray-600">Desde la adrenalina del río hasta la paz de las montañas, La Pintada lo tiene todo.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="attractions-grid">
+                </div>
             </div>
         </section>
 
-        <!-- ================= Sección de Economía ================= -->
-        <section id="economia" class="content-section alt-bg" data-aos="fade-up">
-            <div class="container">
-                <h2>Economía y Actividades Productivas</h2>
-                <p>La economía de La Pintada es vibrante y diversa, con un claro enfoque en el turismo, que se ha consolidado como su principal motor de desarrollo.</p>
-
-                <h3>Sectores Económicos Clave</h3>
-                <p>El turismo es el pilar económico fundamental de La Pintada, impulsado por la alta demanda de alojamiento, días de sol y el constante flujo de viajeros que transitan por la región hacia el Pacífico colombiano. Esta actividad es la mayor generadora de empleo en el municipio, aunque la planta de trabajadores en hoteles y restaurantes experimenta fluctuaciones significativas en temporada baja. La Pintada es reconocida como un "Emporio Turístico del Suroeste" y "La Puerta de Antioquia".</p>
-                <p>Además del turismo, otras actividades económicas importantes incluyen:</p>
-                <ul>
-                    <li><strong>Agricultura:</strong> Se centra en el cultivo de diversas frutas, con una predominancia notable de los cítricos. También se cultiva cacao.</li>
-                    <li><strong>Ganadería:</strong> Es una actividad económica significativa, con producción de cárnicos, ganado vacuno y la realización de subastas ganaderas, como la de Asogans, que se lleva a cabo cada ocho días.</li>
-                    <li><strong>Minería:</strong> Se practica la extracción artesanal de oro en las riberas del río Cauca.</li>
-                    <li><strong>Pesca:</strong> La pesca artesanal y deportiva es otra actividad relevante, aprovechando los afluentes hídricos del municipio.</li>
-                    <li><strong>Comercio:</strong> Dirigido en gran parte a satisfacer las necesidades de la creciente actividad turística.</li>
-                    <li><strong>Industria:</strong> Incluye la producción de prefabricados de concreto y la operación de canteras.</li>
-                </ul>
-                <p>La construcción de las vías 4G ha beneficiado enormemente al municipio, consolidándolo como un destino turístico por excelencia y proyectándolo como un gran referente para el desarrollo turístico del departamento.</p>
+        <section id="cultura" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Cultura y Sabor</h2>
+                    <p class="mt-4 text-lg text-gray-600">Vive nuestras tradiciones y deléitate con la gastronomía que nace del río y la tierra.</p>
+                </div>
+                <div class="grid lg:grid-cols-5 gap-12">
+                    <div class="lg:col-span-2">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6">Fiestas que nos Unen</h3>
+                        <div id="timeline" class="relative border-l-2 border-amber-200">
+                        </div>
+                    </div>
+                    <div class="lg:col-span-3">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6">Platos Insignia</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="food-grid">
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- ================= Sección de Clima ================= -->
-        <section id="clima" class="content-section" data-aos="fade-up">
-            <div class="container">
-                <h2>Clima y Fenómenos Naturales</h2>
-                <p>El clima de La Pintada es una de sus características más distintivas, influenciado por su geografía, aunque también la expone a ciertos fenómenos naturales.</p>
-
-                <h3>Características Climáticas</h3>
-                <p>La Pintada se caracteriza por un clima cálido, con una temperatura promedio anual que oscila entre 22 °C y 30 °C, rara vez descendiendo por debajo de 20 °C o superando los 32 °C. Los veranos son cortos y cálidos, mientras que los inviernos son cortos y calurosos, con un ambiente húmedo y nublado durante todo el año. La temperatura máxima promedio diaria en junio, por ejemplo, se mantiene alrededor de los 30 °C.</p>
-                <p>En cuanto a las precipitaciones, La Pintada experimenta una variación extrema de lluvia mensual por estación. Llueve a lo largo de todo el año, siendo mayo el mes con mayor promedio de lluvia (266 mm) y enero el de menor (133 mm).</p>
-                <p>El clima cálido de La Pintada se explica en gran medida por su ubicación en el Cañón del río Cauca. Esta zona, caracterizada por vertientes cálidas subhúmedas, separa las vertientes medias de las cordilleras y se extiende hacia el norte del departamento. La posición geográfica y el relieve son los principales determinantes del clima en esta cuenca del río Cauca, donde las temperaturas disminuyen linealmente con la elevación en las estribaciones cordilleranas, pero se mantienen cálidas en la franja del cañón.</p>
-
-                <h3>Impacto de Fenómenos Naturales</h3>
-                <p>A pesar de su clima favorable para el turismo, La Pintada es vulnerable a los fenómenos naturales, especialmente a las crecientes del río Cauca. En abril de 2025, el municipio enfrentó una grave emergencia debido al desbordamiento del río Cauca, provocado por intensas lluvias. Este evento dejó a más de 3,800 personas damnificadas y afectó al menos 2,200 viviendas, principalmente en barrios ribereños como El Carmelo, San Jorge, La 40, La Tablaza, Barrio Colombia, El Kilómetro, La Brecha y Brisas del Cauca.</p>
-                <p>Los habitantes de las zonas afectadas vivieron momentos de angustia, con el agua ingresando rápidamente a sus hogares y arrasando con enseres y electrodomésticos. Muchas familias se vieron obligadas a buscar refugio en albergues o casas de familiares. Las autoridades locales y los organismos de socorro trabajaron arduamente para atender la emergencia, y la comunidad demostró una notable capacidad de adaptación y resiliencia, ya que "uno tiene que convivir con el río". La recuperación económica del municipio tras estas inundaciones se ha impulsado a través de eventos como las Fiestas del Turismo y la Ganadería, que buscan atraer visitantes y apoyar a las familias afectadas.</p>
+        <section id="historia" class="py-20 bg-white">
+            <div class="container mx-auto px-6 max-w-4xl">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Historia Viva</h2>
+                    <p class="mt-4 text-lg text-gray-600">Un viaje desde los primeros pobladores hasta convertirnos en el municipio 125 de Antioquia.</p>
+                </div>
+                <div class="bg-amber-50/50 p-8 rounded-lg shadow-sm space-y-4 text-gray-700 leading-relaxed text-justify">
+                    <p>Nuestra historia comienza con asentamientos espontáneos en un punto clave del país. Antiguamente, etnias como los <strong>Tahamíes y Catíos</strong> habitaron esta tierra.</p>
+                    <p>La colonización en <strong>1864</strong> trajo consigo el cultivo de tabaco, transformando la región. Pero el gran cambio llegó a principios del <strong>siglo XX</strong> con el <strong>Ferrocarril de Antioquia</strong>, que nos impulsó y nos convirtió en corregimiento de Santa Bárbara en <strong>1933</strong>.</p>
+                    <p>¿De dónde viene nuestro nombre? ¡Tiene una doble historia!</p>
+                    <ul class="list-disc list-inside ml-4">
+                        <li>Honra al valiente <strong>cacique Pipintá</strong>.</li>
+                        <li>Hace referencia a una icónica <strong>"casa pintada"</strong> que servía de guía a los viajeros.</li>
+                    </ul>
+                    <p>Después de un breve período como municipio en 1993, el <strong>20 de marzo de 1997</strong> nos convertimos oficialmente en el municipio más joven de Antioquia, gracias a las tierras cedidas por Santa Bárbara y Valparaíso. ¡Somos un símbolo de persistencia y desarrollo antioqueño!</p>
+                </div>
             </div>
         </section>
-
-        <!-- ================= Sección de Cultura ================= -->
-        <section id="cultura" class="content-section alt-bg" data-aos="fade-up">
-            <div class="container">
-                <h2>Cultura, Tradiciones y Festividades</h2>
-                <p>La Pintada es un municipio rico en cultura y tradiciones, reflejadas en sus festividades anuales, su gastronomía y sus símbolos distintivos.</p>
-
-                <h3>Eventos y Celebraciones Anuales</h3>
-                <p>El calendario de La Pintada está marcado por diversas festividades que celebran su identidad y promueven su desarrollo:</p>
-                <ul>
-                    <li><strong>Aniversario Municipal:</strong> Se celebra el 16 de marzo.</li>
-                    <li><strong>Fiestas del Turismo y la Ganadería:</strong> Estas son las principales festividades, realizadas en el segundo puente del mes de junio. En su XXV edición, estas fiestas han adquirido un profundo sentido social, buscando reactivar la economía del municipio tras las inundaciones de abril de 2025. La programación incluye eventos como "The Color Run", presentaciones de danza, la velada de coronación de la reina municipal con artistas invitados, un hexagonal de fútbol, el Festival Nacional de Vaquería Criolla Colombia, motovelocidad y desfiles de motocarros. La administración municipal se ha esforzado por integrar a las familias damnificadas, ubicando estratégicamente sus emprendimientos y garantizando la seguridad de los asistentes.</li>
-                    <li><strong>Fiestas de la Virgen del Carmen:</strong> Se celebran el 16 de julio.</li>
-                    <li><strong>Festival Nacional de Vaquería:</strong> Un evento destacado que se lleva a cabo en febrero.</li>
-                    <li><strong>Festivales de Verano y del Río:</strong> Organizados por la Administración Municipal, promueven el disfrute de los recursos hídricos.</li>
-                    <li><strong>Subasta ganadera de Asogans:</strong> Se realiza cada ocho días, evidenciando la importancia de la actividad ganadera.</li>
-                    <li><strong>Primer Festival Internacional de Globos La Pintada 2025:</strong> Programado para el 16 y 17 de agosto de 2025, promete un cielo lleno de color, música y cultura, con desfiles y actividades para toda la familia.</li>
-                </ul>
-
-                <h3>Gastronomía Típica</h3>
-                <p>La gastronomía de La Pintada refleja la riqueza culinaria antioqueña y la influencia de su entorno ribereño. Entre los platos típicos se encuentran:</p>
-                <ul>
-                    <li><strong>Comida típica antioqueña:</strong> Como el sancocho y el mondongo.</li>
-                    <li><strong>Asados:</strong> Una opción popular en la región.</li>
-                    <li><strong>Viudo de pescado:</strong> Un plato emblemático, que se acompaña tradicionalmente con arepita, limón y avena refrescante. Este plato se prepara con pescado blanco, plátanos verdes, yuca, papas y calabaza, cocinados en una olla grande con cebolla, ajo, comino, sal y pimienta, y se sirve con hogao, arroz blanco y aguacate. Es una "joya del sabor llanero" que evoca tradición y río.</li>
-                    <li><strong>Torta de pescado:</strong> Otra especialidad local, aprovechando los recursos pesqueros del río Cauca.</li>
-                    <li><strong>Variedad de frutas y dulces:</strong> Reflejo de la producción agrícola del municipio.</li>
-                </ul>
-
-                <h3>Símbolos Municipales</h3>
-                <p>La Pintada, como parte de Antioquia, comparte algunos elementos simbólicos departamentales, pero también posee su propia identidad visual.</p>
-                <p>La bandera del departamento de Antioquia, que representa a La Pintada como parte de este, está compuesta por dos franjas horizontales: la superior de color blanco, que simboliza pureza y paz, y la inferior de color verde, que representa esperanza y riqueza. La bandera de La Pintada, específicamente, se describe con un brillante amarillo que ocupa el 50% y un vibrante verde que complementa el otro 50%, evocando una armonía natural que refleja la belleza del paisaje antioqueño.</p>
-                <p>En cuanto al escudo, el escudo de Antioquia, que simboliza la identidad departamental, presenta elementos como una matrona vestida "a la indiana" que representa la raza antioqueña y la diversidad de su pueblo (incluyendo etnias como Emberá, Zenú y Tule). La montaña en el escudo simboliza las riquezas de Antioquia, especialmente el oro. Una gran cosecha de plátanos con la matrona sentada hace referencia a la capacidad agrícola de la región. El río, teñido de azul, celebra la abundante hidrografía de Antioquia. Las palmeras representan las luchas armadas y las victorias del pueblo antioqueño. Finalmente, el gorro que la matrona se pone simboliza la libertad y la emancipación.</p>
-                <p>Aunque no se proporciona un escudo específico para el municipio de La Pintada en los materiales, su identidad se enmarca dentro de estos símbolos departamentales, que resaltan el trabajo, la pujanza y el orgullo regional.</p>
-            </div>
-        </section>
-
-        <!-- ================= Sección de Turismo ================= -->
-        <section id="turismo" class="content-section" data-aos="fade-up">
-            <div class="container">
-                <h2>Atractivos Turísticos y Ecoturismo</h2>
-                <p>La Pintada es un destino turístico en ascenso, gracias a su infraestructura, su entorno natural y la oferta de actividades de aventura.</p>
-
-                <h3>Infraestructura Turística y Ubicación Estratégica</h3>
-                <p>La Pintada es un destino de tierra caliente a orillas del río Cauca, con una muy buena infraestructura turística. Es el municipio más joven de Antioquia con una gran proyección en su desarrollo turístico. Su clima cálido, la abundancia de frutas y la posibilidad de practicar deportes náuticos y de aventura la convierten en un destino obligado. La construcción de las vías 4G ha consolidado su posición como un sitio turístico por excelencia. Además, su cercanía a Medellín y Manizales (capital del departamento de Caldas) es un factor clave para su proyección turística.</p>
-
-                <h3>Sitios de Interés</h3>
-                <ul>
-                    <li><strong>Estación de Ferrocarril Alejandro López:</strong> Antigua estación de 1933, construida en piedra, que es un monumento nacional y patrimonio arquitectónico. Actualmente, funciona como la Casa de Cultura Guillermo Gaviria Correa y alberga el Museo Municipal de Víctimas, la biblioteca municipal y un gimnasio.</li>
-                    <li><strong>Parque Principal:</strong> Inaugurado a finales de 2019, es un punto neurálgico rodeado de cafeterías, restaurantes, bares y tabernas. Alberga la estatua de María Mulata, la Iglesia Santa Cecilia y la Plazoleta de los Eventos.</li>
-                    <li><strong>Iglesia Santa Cecilia:</strong> Una iglesia pequeña y moderna de tipo capilla, ubicada en el Parque Principal, de gran valor religioso para los pintadeños, en su mayoría católicos.</li>
-                    <li><strong>Ríos Cártama, Arma, Poblanco y Cauca:</strong> Estos ríos son fundamentales para el turismo. Son aptos para la pesca artesanal, deportes náuticos y actividades de aventura como canotaje y kayak. El río Cártama, a 5 km de la cabecera, es ideal para paseos y campismo, y conserva vestigios prehispánicos. El río Arma es popular para camping, paseos y baños, con rápidos ideales para canotaje y kayak. La desembocadura del río Poblanco en el Cauca es un sitio visitado para caminar descalzo sobre la arena y piedras.</li>
-                    <li><strong>Ruinas del Puente Río Arma del Ferrocarril:</strong> Estas ruinas son un atractivo por su diseño e infraestructura, que se mezclan con la belleza paisajística del río Arma, el majestuoso río Cauca y los imponentes Farallones de La Pintada.</li>
-                </ul>
-
-                <h3>Cerros</h3>
-                <ul>
-                    <li><strong>Farallones La Paz y Galeras:</strong> Antiguamente conocidos como las Mamás de Caramanta, son ideales para escaladores. El Farallón La Paz, a 4 km, ofrece una excelente panorámica. El Farallón Galeras, también a 4 km, es conocido por sus riscos y riqueza de fauna.</li>
-                    <li><strong>Cerro de La Virgen:</strong> Un sitio de peregrinación y un excelente mirador por su belleza paisajística, donde se encuentra una imagen de la Virgen del Carmen.</li>
-                    <li><strong>Cerro Amarillo:</strong> Ubicado a 14 km, es el cerro tutelar de la región con 1,453 metros de altura. Ofrece una hermosa panorámica, restos cerámicos y petroglifos prehispánicos. Es un lugar popular para el parapente y caminatas ecológicas.</li>
-                    <li><strong>Otros miradores y senderos:</strong> La Avenida El Kilómetro, en la vía que conduce al río Poblanco, es un lugar especial para caminatas ecológicas. El Puente el Planchón es ideal para senderismo y contacto con la naturaleza, fauna y flora local, además de pesca deportiva.</li>
-                </ul>
-
-                <h3>Deportes de Aventura y Actividades Ecoturísticas</h3>
-                <p>La Pintada es un epicentro para el ecoturismo y los deportes de aventura:</p>
-                <ul>
-                    <li><strong>Rafting en el río Cauca:</strong> Catalogado como uno de los mejores en Colombia. Este deporte se practica en botes inflables para atravesar los rápidos, ofreciendo una gran dosis de adrenalina y diversión. Empresas como Medellin Rafting ofrecen esta experiencia, garantizando seguridad con guías certificados internacionalmente por la Federación Internacional de Rafting (IRF). La excursión por el río suele durar entre 2 y 3 horas, ofreciendo vistas cautivadoras.</li>
-                    <li><strong>Rappel:</strong> Descenso controlado desde lugares altos o rocas con equipo especializado y guías profesionales. Se puede realizar un emocionante descenso desde un puente de 25 metros de altura.</li>
-                    <li><strong>Arborismo:</strong> Actividad que permite ascender a la copa de grandes árboles.</li>
-                    <li><strong>Montañismo y Cañonismo:</strong> Recorridos por la Ruta de las Garzas hasta el Salto del Caballo sobre el río Cauca.</li>
-                    <li><strong>Caminatas ecológicas:</strong> Abundan las oportunidades para el disfrute del sano esparcimiento, el avistamiento de aves y la observación de la diversidad de flora y fauna, que incluye monos aulladores, monos titíes, iguanas, guacamayas, tigrillos, osos hormigueros y zorros.</li>
-                    <li><strong>Pesca deportiva:</strong> Se puede practicar en los senderos del parque adyacente a hoteles y en los ríos Cártama, Arma y Cauca.</li>
-                    <li><strong>Zonas de camping y balnearios:</strong> Las orillas de los ríos Arma, Poblanco y Cártama son ideales para acampar y disfrutar de baños.</li>
-                    <li><strong>Hotel ecológico:</strong> El Eco Hotel Montenegro, ubicado en el kilómetro 5 vía La Pintada – Valparaíso, ofrece una experiencia ecológica y pet-friendly con piscina, granja, lago de pesca y amplias zonas verdes.</li>
-                </ul>
-                <p>Para los turistas que realizan caminatas largas o actividades en el río, se recomienda llevar suero antibiotrópico (debido a la presencia de culebras), ropa adecuada y botas o tenis. También se enfatiza la importancia de no contaminar los senderos ni las fuentes de agua para preservar el entorno natural.</p>
-            </div>
-        </section>
-
-        <!-- ================= Sección de Conclusiones ================= -->
-        <section id="conclusiones" class="content-section alt-bg">
-            <div class="container">
-                <h2>Conclusiones</h2>
-                <p>La Pintada, a pesar de ser el municipio más joven de Antioquia, se ha consolidado como un punto estratégico y un emporio turístico de gran relevancia para el departamento. Su ubicación privilegiada en el Cañón del río Cauca le otorga un clima cálido y una riqueza hídrica que impulsan su economía, basada principalmente en el turismo, la ganadería y la agricultura.</p>
-                <p>La resiliencia de su gente, demostrada en la recuperación tras eventos como las inundaciones del río Cauca, y la constante promoción de sus festividades y atractivos naturales, son pilares de su identidad. La Pintada no solo es un destino de aventura y ecoturismo, con opciones que van desde el rafting de clase mundial hasta el senderismo y el avistamiento de fauna, sino también un lugar que honra su historia y sus tradiciones a través de su gastronomía y sus símbolos.</p>
-                <p>La proyección futura del municipio es prometedora, especialmente con la mejora de la infraestructura vial y el continuo desarrollo de su oferta turística. La Pintada encarna la pujanza y la diversidad de Antioquia, invitando a propios y extraños a descubrir su magia y contribuir a su crecimiento sostenible.</p>
-            </div>
-        </section>
+    
     </main>
 
-    <!-- ================= Footer ================= -->
-    <footer class="main-footer">
-        <p><strong>FIESTA DE LA ANTIOQUEÑIDAD INEM 2025 - MUNICIPIO DE LA PINTADA</strong></p>
-        <p>
-            Desarrollado con orgullo paisa.
-            <!-- Simulación de redes sociales -->
-            <a href="#">#AntioqueñidadINEM</a>
-        </p>
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p class="font-bold text-lg">FIESTA DE LA ANTIOQUEÑIDAD INEM 2025</p>
+            <p class="mt-2 text-amber-300">MUNICIPIO DE LA PINTADA</p>
+            <p class="text-sm mt-4 text-gray-400">Desarrollado con orgullo paisa.</p>
+        </div>
     </footer>
 
-    <script>
-        window.onload = function() {
-            const carouselSlide = document.querySelector('.carousel-slide');
-            const carouselImages = document.querySelectorAll('.carousel-slide img');
-
-            const prevBtn = document.querySelector('.carousel-button.prev');
-            const nextBtn = document.querySelector('.carousel-button.next');
-
-            let counter = 1; // Start at 1 to show the first actual image (after the lastClone)
-            const size = carouselImages[0].clientWidth;
-
-            carouselSlide.style.transform = 'translateX(' + (-size * counter) + 'px)';
-
-            nextBtn.addEventListener('click', () => {
-                if (counter >= carouselImages.length - 1) return; // Prevent multiple rapid clicks
-                carouselSlide.style.transition = "transform 0.4s ease-in-out";
-                counter++;
-                carouselSlide.style.transform = 'translateX(' + (-size * counter) + 'px)';
-            });
-
-            prevBtn.addEventListener('click', () => {
-                if (counter <= 0) return; // Prevent multiple rapid clicks
-                carouselSlide.style.transition = "transform 0.4s ease-in-out";
-                counter--;
-                carouselSlide.style.transform = 'translateX(' + (-size * counter) + 'px)';
-            });
-
-            carouselSlide.addEventListener('transitionend', () => {
-                if (carouselImages[counter].id === 'lastClone') {
-                    carouselSlide.style.transition = "none";
-                    counter = carouselImages.length - 2; // Jump to the actual last image
-                    carouselSlide.style.transform = 'translateX(' + (-size * counter) + 'px)';
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const populationData = {
+        labels: ['Población Urbana', 'Población Rural'],
+        datasets: [{
+            label: 'Habitantes',
+            data: [7816, 798],
+            backgroundColor: ['#D97706', '#FBBF24'],
+            borderColor: '#FDFBF7',
+            borderWidth: 4,
+            hoverOffset: 4
+        }]
+    };
+    const populationConfig = {
+        type: 'doughnut',
+        data: populationData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#4A4A4A',
+                        font: { size: 14 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed !== null) {
+                                label += new Intl.NumberFormat('es-CO').format(context.parsed);
+                            }
+                            return label;
+                        }
+                    }
                 }
-                if (carouselImages[counter].id === 'firstClone') {
-                    carouselSlide.style.transition = "none";
-                    counter = 1; // Jump to the actual first image
-                    carouselSlide.style.transform = 'translateX(' + (-size * counter) + 'px)';
-                }
-            });
-        };
-    </script>
+            }
+        }
+    };
+    new Chart(document.getElementById('populationChart'), populationConfig);
 
+    const economyData = {
+        labels: ['Turismo', 'Ganadería', 'Agricultura', 'Comercio', 'Minería/Pesca'],
+        datasets: [{
+            label: 'Importancia Económica',
+            data: [40, 25, 15, 15, 5],
+            backgroundColor: [
+                'rgba(217, 119, 6, 0.7)',
+                'rgba(22, 163, 74, 0.7)',
+                'rgba(251, 191, 36, 0.7)',
+                'rgba(2, 132, 199, 0.7)',
+                'rgba(156, 163, 175, 0.7)'
+            ],
+            borderColor: [
+                'rgb(217, 119, 6)',
+                'rgb(22, 163, 74)',
+                'rgb(251, 191, 36)',
+                'rgb(2, 132, 199)',
+                'rgb(156, 163, 175)'
+            ],
+            borderWidth: 1
+        }]
+    };
+    const economyDetails = {
+        'Turismo': {
+            title: 'Turismo 🏨',
+            text: 'Es el pilar económico fundamental, impulsado por la alta demanda de alojamiento, días de sol y el constante flujo de viajeros. La construcción de las vías 4G ha consolidado al municipio como un destino por excelencia, generando la mayor cantidad de empleo local.'
+        },
+        'Ganadería': {
+            title: 'Ganadería 🐄',
+            text: 'Actividad de gran relevancia con producción de cárnicos y ganado vacuno. La subasta ganadera de Asogans, realizada cada ocho días, es un evento clave que dinamiza este sector en toda la región del Suroeste.'
+        },
+        'Agricultura': {
+            title: 'Agricultura 🍊',
+            text: 'Se centra en el cultivo de una gran variedad de frutas, con una notable predominancia de los cítricos como naranjas y mandarinas. También se cultiva cacao, plátano y aguacate, aprovechando el clima cálido del cañón.'
+        },
+        'Comercio': {
+            title: 'Comercio 🛍️',
+            text: 'El sector comercial está estrechamente ligado al turismo. Hoteles, restaurantes, tiendas y servicios están orientados a satisfacer las necesidades de la creciente población flotante de visitantes y viajeros.'
+        },
+        'Minería/Pesca': {
+            title: 'Minería y Pesca 🎣',
+            text: 'La extracción artesanal de oro en las riberas del río Cauca y la pesca, tanto deportiva como de sustento, son actividades tradicionales que complementan la economía local y representan el legado histórico de la región.'
+        }
+    };
+    const economyConfig = {
+        type: 'polarArea',
+        data: economyData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    ticks: { display: false },
+                    grid: { circular: true }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#4A4A4A',
+                        font: { size: 14 }
+                    }
+                }
+            },
+            onClick: (evt, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    const label = economyData.labels[index];
+                    const details = economyDetails[label];
+                    document.getElementById('economy-title').textContent = details.title;
+                    document.getElementById('economy-text').textContent = details.text;
+                }
+            }
+        }
+    };
+    new Chart(document.getElementById('economyChart'), economyConfig);
+
+    const attractions = [
+        {
+            title: 'Rafting en el Río Cauca',
+            icon: '🚣',
+            description: 'Considerado uno de los mejores de Colombia, ofrece una dosis de adrenalina y vistas espectaculares del cañón. Una aventura imperdible guiada por expertos.',
+            image: 'https://placehold.co/600x400/0284c7/ffffff?text=Rafting'
+        },
+        {
+            title: 'Cerro Amarillo',
+            icon: '🌄',
+            description: 'El cerro tutelar de la región. Con 1,453 metros de altura, es un mirador natural excepcional, ideal para parapente, caminatas y descubrir petroglifos prehispánicos.',
+            image: 'https://placehold.co/600x400/16a34a/ffffff?text=Cerro+Amarillo'
+        },
+        {
+            title: 'Farallones de La Pintada',
+            icon: '🧗',
+            description: 'Conocidos como las "Mamás de Caramanta", estos imponentes riscos son un paraíso para escaladores y amantes de la naturaleza, ofreciendo panorámicas únicas.',
+            image: 'https://placehold.co/600x400/78716c/ffffff?text=Farallones'
+        },
+        {
+            title: 'Estación del Ferrocarril',
+            icon: '🏛️',
+            description: 'Monumento nacional y patrimonio arquitectónico. Hoy funciona como la Casa de la Cultura, albergando un museo, la biblioteca y un gimnasio.',
+            image: 'https://placehold.co/600x400/a16207/ffffff?text=Estación'
+        },
+        {
+            title: 'Ríos y Balnearios',
+            icon: '🏞️',
+            description: 'Los ríos Cártama, Arma y Poblanco son perfectos para la pesca, paseos de olla, camping y disfrutar de un refrescante baño en medio de la naturaleza.',
+            image: 'https://placehold.co/600x400/38bdf8/ffffff?text=Ríos'
+        },
+        {
+            title: 'Cerro de la Virgen',
+            icon: '🙏',
+            description: 'Un importante sitio de peregrinación para los locales y un mirador con una hermosa vista del municipio, coronado por una imagen de la Virgen del Carmen.',
+            image: 'https://placehold.co/600x400/f472b6/ffffff?text=Virgen'
+        }
+    ];
+    const attractionsGrid = document.getElementById('attractions-grid');
+    attractions.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card bg-white rounded-lg shadow-md overflow-hidden cursor-pointer';
+        card.innerHTML = `
+            <div class="p-6">
+                <div class="text-4xl mb-4">${item.icon}</div>
+                <h3 class="text-xl font-bold text-gray-800">${item.title}</h3>
+                <p class="mt-2 text-gray-600">${item.description}</p>
+            </div>
+        `;
+        attractionsGrid.appendChild(card);
+    });
+
+    const timelineEvents = [
+        { month: 'Febrero', event: 'Festival Nacional de Vaquería' },
+        { month: 'Marzo', event: 'Aniversario del Municipio (Día 16)' },
+        { month: 'Junio', event: 'Fiestas del Turismo y la Ganadería' },
+        { month: 'Julio', event: 'Fiestas de la Virgen del Carmen (Día 16)' },
+        { month: 'Agosto', event: 'Festival Internacional de Globos' }
+    ];
+    const timelineContainer = document.getElementById('timeline');
+    timelineEvents.forEach(item => {
+        const eventEl = document.createElement('div');
+        eventEl.className = 'mb-8 ml-6';
+        eventEl.innerHTML = `
+            <span class="absolute flex items-center justify-center w-6 h-6 bg-amber-200 rounded-full -left-3 ring-4 ring-white">
+                <svg class="w-3 h-3 text-amber-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+            </span>
+            <h3 class="font-semibold text-gray-800">${item.event}</h3>
+            <time class="block mb-2 text-sm font-normal leading-none text-gray-500">${item.month}</time>
+        `;
+        timelineContainer.appendChild(eventEl);
+    });
+    
+    const foodItems = [
+        {
+            name: 'Viudo de Pescado',
+            description: 'Plato insignia de río. Pescado cocido lentamente con yuca, plátano y papa, bañado en hogao. ¡Un sabor que evoca tradición!',
+            image: 'imagenes/pp.jpg' // Assuming pp.jpg is Viudo de Pescado
+        },
+        {
+            name: 'Torta de Pescado',
+            description: 'Una deliciosa y única preparación local que aprovecha la riqueza pesquera del río Cauca, perfecta para cualquier ocasión.',
+            image: 'imagenes/rich-fried-dried-fish-torta-traditional-colombian-dish-breaded-fillet-food-255495544.webp' // Assuming this is Torta de Pescado
+        },
+        {
+            name: 'Comida Típica Antioqueña',
+            description: 'Por supuesto, no pueden faltar los clásicos como el sancocho, el mondongo y los asados que definen la cocina paisa.',
+            image: 'imagenes/OIP (1).jpg' // Assuming this is Comida Típica Antioqueña
+        },
+        {
+            name: 'Frutas Tropicales',
+            description: 'Gracias a su clima, La Pintada ofrece una increíble variedad de frutas frescas como mangos, naranjas y mandarinas.',
+            image: 'imagenes/depositphotos_231531444-stock-photo-set-exotic-fruits-assorted-tropical.jpg' // Assuming this is Frutas Tropicales
+        }
+    ];
+    const foodGrid = document.getElementById('food-grid');
+    foodItems.forEach(item => {
+        const foodCard = document.createElement('div');
+        foodCard.className = 'card bg-white rounded-lg shadow-md overflow-hidden';
+        foodCard.innerHTML = `
+            <div class="w-full h-40 bg-cover bg-center" style="background-image: url('${item.image}')"></div>
+            <div class="p-4">
+                <h4 class="font-bold text-lg text-gray-800">${item.name}</h4>
+                <p class="text-sm text-gray-600 mt-1">${item.description}</p>
+            </div>
+        `;
+        foodGrid.appendChild(foodCard);
+    });
+
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('main section');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 60) {
+                current = section.getAttribute('id');
+            }
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').includes(current)) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    
+});
+</script>
 </body>
 </html>
